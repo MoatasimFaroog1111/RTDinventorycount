@@ -18,14 +18,28 @@ class AiAndExportTests {
         val tmpFile = File.createTempFile("test", ".pdf")
 
         val items = listOf(
-            InventoryItem(label = "Item A", confidence = 0.95f, sessionId = 1L),
-            InventoryItem(label = "Item B", confidence = 0.87f, sessionId = 1L)
+            InventoryItem(
+                sessionId   = 1L,
+                label       = "Item A",
+                category    = "Electronics",
+                confidence  = 0.95f,
+                timestamp   = System.currentTimeMillis(),
+                incomplete  = false
+            ),
+            InventoryItem(
+                sessionId   = 1L,
+                label       = "Item B",
+                category    = null,
+                confidence  = 0.87f,
+                timestamp   = System.currentTimeMillis(),
+                incomplete  = null
+            )
         )
 
         val exporter = PdfExporter()
         exporter.export(
-            items = items,
-            file = tmpFile,
+            items     = items,
+            file      = tmpFile,
             sessionId = 1L
         )
 
