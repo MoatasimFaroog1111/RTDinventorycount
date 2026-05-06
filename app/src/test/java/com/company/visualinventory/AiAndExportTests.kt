@@ -1,7 +1,6 @@
 package com.company.visualinventory
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
+import com.company.visualinventory.data.InventoryItem
 import com.company.visualinventory.export.PdfExporter
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -16,21 +15,21 @@ class AiAndExportTests {
 
     @Test
     fun pdfExportWritesPdfHeader() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val tmpFile = File.createTempFile("test", ".pdf")
 
-        val file = File(context.cacheDir, "test.pdf")
+        val items = listOf(
+            InventoryItem(label = "Item A", confidence = 0.95f, sessionId = 1L),
+            InventoryItem(label = "Item B", confidence = 0.87f, sessionId = 1L)
+        )
 
         val exporter = PdfExporter()
         exporter.export(
-            context = context,
-            file = file,
-            data = listOf(
-                "Item A - 10",
-                "Item B - 5"
-            )
+            items = items,
+            file = tmpFile,
+            sessionId = 1L
         )
 
-        assertTrue(file.exists())
-        assertTrue(file.length() > 0)
+        assertTrue(tmpFile.exists())
+        assertTrue(tmpFile.length() > 0)
     }
 }
