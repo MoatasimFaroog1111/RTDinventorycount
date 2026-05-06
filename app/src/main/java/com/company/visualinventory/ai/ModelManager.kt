@@ -36,25 +36,19 @@ class ModelManager(private val context: Context) {
     }
 
     fun loadLabels(uri: Uri): Result<Unit> = runCatching {
-        val display = uri.toString().lowercase()
-        require(display.contains("labels") || display.endsWith(".txt") || display.contains(".txt")) {
-            "Select a labels.txt file"
-        }
         val lines = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
             reader.readLines().map { it.trim() }.filter { it.isNotBlank() }
-        } ?: error("labels file unreadable")
-        require(lines.isNotEmpty()) { "labels.txt is empty" }
+        } ?: error("Cannot read labels file. Try a different file manager.")
+        require(lines.isNotEmpty()) { "labels file is empty" }
         internalLabelsFile.writeText(lines.joinToString("\n"))
         labels = lines
     }
 
     fun copyModelToInternal(uri: Uri): Result<String> = runCatching {
-        val display = uri.toString().lowercase()
-        require(display.contains(".tflite") || display.contains("model")) { "Select a .tflite model file" }
         context.contentResolver.openInputStream(uri)?.use { input ->
             internalModelFile.outputStream().use { output -> input.copyTo(output) }
-        } ?: error("model file unreadable")
-        require(internalModelFile.length() > 1024) { "model.tflite is too small or invalid" }
+        } ?: error("Cannot read model file. Try a different file manager.")
+        require(internalModelFile.length() > 1024) { "model file is too small or invalid (${internalModelFile.length()} bytes)" }
         modelPath = internalModelFile.absolutePath
         internalModelFile.absolutePath
     }
